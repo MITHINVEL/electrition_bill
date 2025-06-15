@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1084838992102",
+    "project_id": "electrion-bill",
+    "storage_bucket": "electrion-bill.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084838992102:android:9977545853ca8d913dc327",
+        "android_client_info": {
+          "package_name": "com.android.application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV04hvz_5xOFjIs-IzC5P0neJmybhP_sA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084838992102:android:0545f78d690a30b93dc327",
+        "android_client_info": {
+          "package_name": "com.example.electrition_bill"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV04hvz_5xOFjIs-IzC5P0neJmybhP_sA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
