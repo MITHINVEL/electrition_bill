@@ -69,7 +69,9 @@ class _ProductListPageState extends State<ProductListPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Electrition Shop Bill'),
+        backgroundColor: Colors.purple,
         actions: [
+          
           if (isSelectionMode) ...[
             Row(
               children: [
@@ -92,14 +94,11 @@ class _ProductListPageState extends State<ProductListPage> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.shopping_cart),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => BillPage(cart: widget.cart),
-                  ),
-                );
-              },
+              icon: CircleAvatar(
+                radius: 29,
+                backgroundImage: const AssetImage('assets/logos/logo.jpg'),
+              ),
+              onPressed: () {},
             ),
           ],
         ],

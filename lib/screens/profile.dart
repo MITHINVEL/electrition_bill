@@ -1,3 +1,4 @@
+import 'package:electrition_bill/contents/assets.dart';
 import 'package:electrition_bill/downloads/downloadwidgets/downloade_bill_button.dart';
 import 'package:flutter/material.dart';
 
@@ -13,19 +14,19 @@ class ProfilePage extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            CircleAvatar(
+          children: [
+            const CircleAvatar(
               radius: 48,
-              child: Icon(Icons.person, size: 48),
+              backgroundImage: AssetImage('assets/logos/logo.jpg'),
             ),
-            SizedBox(height: 16),
-            Text('User Name', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
-            Text('user@email.com', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 32),
-            Text('Profile details and settings will appear here.', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 32),
-            DownloadedBillsButton(),
+            const SizedBox(height: 16),
+            const Text('DURGA ELECTRICALS', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            const Text('user@email.com', style: TextStyle(fontSize: 16)),
+            const SizedBox(height: 32),
+            const Text('Profile details and settings will appear here.', style: TextStyle(fontSize: 16)),
+            const SizedBox(height: 32),
+            const DownloadedBillsButton(),
           ],
         ),
       ),

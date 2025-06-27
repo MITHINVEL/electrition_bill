@@ -70,11 +70,25 @@ class _BottomnavigationState extends State<Bottomnavigation> {
             title: const Text('Bill'),
             selectedColor: const Color.fromARGB(255, 39, 41, 176),
           ),
-          BottomBarItem(
-            icon: const Icon(Icons.person),
-            title: const Text('Profile'),
-            selectedColor: Colors.purple,
-          ),
+          
+   BottomBarItem(
+  icon: CircleAvatar(
+    radius: 28, // Bigger avatar
+    backgroundColor: Colors.white,
+    child: ClipOval(
+      child: Image.asset(
+        'assets/logos/logo.jpg',
+        width: 48,
+        height: 48,
+        fit: BoxFit.cover,
+                   
+                   ),
+                  ),
+                ),
+              title: const Text('Profile'),
+             selectedColor: Colors.purple,
+           ),
+          
         ],
         hasNotch: true,
         currentIndex: selected,

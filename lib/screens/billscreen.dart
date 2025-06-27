@@ -1,11 +1,10 @@
 import 'dart:io';
-
+import 'package:electrition_bill/contents/assets.dart';
 import 'package:electrition_bill/moels/product.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
-
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
@@ -164,7 +163,7 @@ class _BillPageState extends State<BillPage> {
               // PDF bill generation (use current productCounts/prices)
               final pdf = pw.Document();
               // Load background image
-              final bgImageBytes = await rootBundle.load('assets/logos/pdfbackground.jpg');
+              final bgImageBytes = await rootBundle.load(LogosAssets.pdfBackground);
               final bgImage = pw.MemoryImage(bgImageBytes.buffer.asUint8List());
               final now = DateTime.now();
               final formattedDate = DateFormat('dd-MM-yyyy').format(now);
