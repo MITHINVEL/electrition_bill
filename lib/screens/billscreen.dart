@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:electrition_bill/moels/product.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:intl/intl.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/foundation.dart';
@@ -41,8 +43,27 @@ class _BillPageState extends State<BillPage> {
   void _removeProduct(String productId) {
     setState(() {
       productCounts.remove(productId);
-      // Also remove from cart for this session
-      widget.cart.removeWhere((p) => p.id == productId);
+      // Do NOT remove from widget.cart; just hide from bill view
+    });
+  }
+
+  void _removeProductAt(int index) {
+    setState(() {
+      final uniqueProducts = widget.cart.toSet().toList();
+      final product = uniqueProducts[index];
+      // Remove only one instance from cart
+      final cartIndex = widget.cart.indexWhere((p) => p.id == product.id);
+      if (cartIndex != -1) {
+        widget.cart.removeAt(cartIndex);
+        // Update productCounts
+        if (productCounts[product.id] != null) {
+          if (productCounts[product.id]! > 1) {
+            productCounts[product.id] = productCounts[product.id]! - 1;
+          } else {
+            productCounts.remove(product.id);
+          }
+        }
+      }
     });
   }
 
@@ -142,51 +163,78 @@ class _BillPageState extends State<BillPage> {
               }
               // PDF bill generation (use current productCounts/prices)
               final pdf = pw.Document();
+              // Load background image
+              final bgImageBytes = await rootBundle.load('assets/logos/pdfbackground.jpg');
+              final bgImage = pw.MemoryImage(bgImageBytes.buffer.asUint8List());
+              final now = DateTime.now();
+              final formattedDate = DateFormat('dd-MM-yyyy').format(now);
+              final formattedTime = DateFormat('hh:mm:ss a').format(now); // 12-hour format with AM/PM
               pdf.addPage(
                 pw.Page(
                   build: (pw.Context context) {
-                    return pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    return pw.Stack(
                       children: [
-                        pw.Text('DURGA ELECTRICALS', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold), textAlign: pw.TextAlign.center),
-                        pw.Text('Cell: 7373478899,9787677881', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold), textAlign: pw.TextAlign.center),
-                        pw.SizedBox(height: 16),
-                        pw.Table(
-                          border: pw.TableBorder.all(),
+                        pw.Positioned.fill(
+                          child: pw.Image(bgImage, fit: pw.BoxFit.cover),
+                        ),
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
-                            pw.TableRow(
+                            pw.Row(
+                              mainAxisAlignment: pw.MainAxisAlignment.end,
                               children: [
-                                pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('Product Name', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
-                                pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('Qty', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
-                                pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('Price', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
-                                pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('Total', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                                pw.Column(
+                                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                                  children: [
+                                    pw.Text('Date: $formattedDate', style: pw.TextStyle(fontSize: 12)),
+                                    pw.Text('Time: $formattedTime', style: pw.TextStyle(fontSize: 12)),
+                                  ],
+                                ),
                               ],
                             ),
-                            ...productCounts.entries.map((entry) {
-                              final product = widget.cart.firstWhere((p) => p.id == entry.key);
-                              final count = entry.value;
-                              final price = productPrices[entry.key] ?? product.price;
-                              return pw.TableRow(
-                                children: [
-                                  pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text(product.name)),
-                                  pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text(count.toString())),
-                                  pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text(price.toStringAsFixed(2))),
-                                  pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text((price * count).toStringAsFixed(2))),
-                                ],
-                              );
-                            }).toList(),
-                            pw.TableRow(
+                            pw.SizedBox(height: 4),
+                            pw.Text('DURGA ELECTRICALS', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold), textAlign: pw.TextAlign.center),
+                              pw.Text('Pennagaram main Road,B Agraharam', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold), textAlign: pw.TextAlign.center),
+                            pw.Text('Cell: 7373478899,9787677881', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold), textAlign: pw.TextAlign.center),
+                            pw.SizedBox(height: 16),
+                            pw.Table(
+                              border: pw.TableBorder.all(),
                               children: [
-                                pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('')),
-                                pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('')),
-                                pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('Total', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
-                                pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text(
-                                  productCounts.entries.fold(0.0, (sum, entry) {
-                                    final price = productPrices[entry.key] ?? 0.0;
-                                    return sum + price * entry.value;
-                                  }).toStringAsFixed(2),
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                                )),
+                                pw.TableRow(
+                                  children: [
+                                    pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('Product Name', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                                    pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('Qty', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                                    pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('Price', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                                    pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('Total', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                                  ],
+                                ),
+                                ...productCounts.entries.map((entry) {
+                                  final product = widget.cart.firstWhere((p) => p.id == entry.key);
+                                  final count = entry.value;
+                                  final price = productPrices[entry.key] ?? product.price;
+                                  return pw.TableRow(
+                                    children: [
+                                      pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text(product.name)),
+                                      pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text(count.toString())),
+                                      pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text(price.toStringAsFixed(2))),
+                                      pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text((price * count).toStringAsFixed(2))),
+                                    ],
+                                  );
+                                }).toList(),
+                                pw.TableRow(
+                                  children: [
+                                    pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('')),
+                                    pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('')),
+                                    pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text('Total', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                                    pw.Padding(padding: const pw.EdgeInsets.all(4), child: pw.Text(
+                                      productCounts.entries.fold(0.0, (sum, entry) {
+                                        final price = productPrices[entry.key] ?? 0.0;
+                                        return sum + price * entry.value;
+                                      }).toStringAsFixed(2),
+                                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                                    )),
+                                  ],
+                                ),
                               ],
                             ),
                           ],
@@ -200,6 +248,7 @@ class _BillPageState extends State<BillPage> {
                 // Save bill products to a text file as well as PDF
                 final StringBuffer billText = StringBuffer();
                 billText.writeln('DURGA ELECTRICALS');
+                billText.writeln('Pennagaram main Road,B Agraharam');
                 billText.writeln('Cell: 7373478899,9787677881');
                 billText.writeln('-----------------------------');
                 billText.writeln('Product Name | Qty | Price | Total');
@@ -247,6 +296,7 @@ class _BillPageState extends State<BillPage> {
                     downloadsDir = await getApplicationDocumentsDirectory();
                   }
                   if (downloadsDir == null) {
+                    if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Could not find a valid directory to save the PDF.')),
                     );
@@ -261,6 +311,7 @@ class _BillPageState extends State<BillPage> {
                   try {
                     await pdfFile.writeAsBytes(await pdf.save());
                   } catch (e) {
+                    if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('PDF file write failed: $e')),
                     );
@@ -269,6 +320,7 @@ class _BillPageState extends State<BillPage> {
                   try {
                     await txtFile.writeAsString(billText.toString());
                   } catch (e) {
+                    if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Text file write failed: $e')),
                     );
@@ -278,20 +330,24 @@ class _BillPageState extends State<BillPage> {
                   final pdfExists = await pdfFile.exists();
                   final txtExists = await txtFile.exists();
                   if (pdfExists && txtExists) {
+                    if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('PDF & Product list saved!\nPath: $pdfPath')),
                     );
                   } else {
+                    if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Bill save failed. Please try again.')),
                     );
                   }
                 } catch (e) {
+                  if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('PDF download fail: $e\nPath: \\${debugPath ?? "unknown"}')),
                   );
                 }
               } catch (e) {
+                if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('An error occurred: $e')),
                 );
@@ -440,7 +496,7 @@ class _BillPageState extends State<BillPage> {
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () {
-                          _removeProduct(product.id);
+                          _removeProductAt(index);
                         },
                       ),
                     ],
