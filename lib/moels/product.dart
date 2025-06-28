@@ -14,4 +14,13 @@ class Product {
       price: (data['price'] as num?)?.toDouble() ?? 0.0,
     );
   }
+
+  static Product fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Product(
+      id: doc.id,
+      name: data['name'] ?? '',
+      price: (data['price'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
 }

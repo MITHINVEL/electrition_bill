@@ -1,3 +1,4 @@
+import 'package:electrition_bill/core/constant.dart';
 import 'package:electrition_bill/moels/product.dart';
 import 'package:electrition_bill/widgets/percentage_screen.dart';
 
@@ -44,21 +45,38 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GestureDetector( 
+       onTap: () {
+      FocusScope.of(context).unfocus();
+    },
+    child: Scaffold(
       appBar: AppBar(
+         backgroundColor: primary,
         title: const Text('Search Products'),
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(20.0),
             child: TextField(
               focusNode: _searchFocus,
               controller: _searchController,
               decoration: const InputDecoration(
                 labelText: 'Search',
+                labelStyle: TextStyle(
+                  fontSize: 25
+                ),
                 prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: primary,width: 2),
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: yellowColor,width: 2),
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                 
+                ),
+                
               ),
               onChanged: (value) {
                 setState(() {
@@ -89,61 +107,81 @@ class _SearchPageState extends State<SearchPage> {
                     final productName = data['name'] ?? '';
                     final productPrice = (data['price'] as num?)?.toDouble() ?? 0.0;
                     final productId = products[index].id;
-                    return ListTile(
-                      title: Text(productName),
-                      subtitle: Text('₹${productPrice.toStringAsFixed(2)}'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () async {
-                          final result = await showDialog<int>(
-                            context: context,
-                            builder: (context) {
-                              final controller = TextEditingController(text: '1');
-                              return AlertDialog(
-                                title: Text(productName),
-                                content: TextField(
-                                  autofocus: true,
-                                  keyboardType: TextInputType.number,
-                                  controller: controller,
-                                  decoration: const InputDecoration(labelText: 'Count'),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.of(context).pop(),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      final val = int.tryParse(controller.text);
-                                      if (val != null && val > 0) {
-                                        Navigator.of(context).pop(val);
-                                      }
-                                    },
-                                    child: const Text('OK'),
-                                  ),
-                                ],
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3), // changes position of shadow
+                            ),
+                          ],
+                        ),
+                        child: ListTile(
+                          title: Text(productName),
+                          subtitle: Text('₹${productPrice.toStringAsFixed(2)}'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.add,
+                            size: 30,
+                            color: blue, // Changed to blue for consistency
+                            ),
+                            onPressed: () async {
+                              final result = await showDialog<int>(
+                                context: context,
+                                builder: (context) {
+                                  final controller = TextEditingController(text: '1');
+                                  return AlertDialog(
+                                    title: Text(productName),
+                                    content: TextField(
+                                      autofocus: true,
+                                      keyboardType: TextInputType.number,
+                                      controller: controller,
+                                      decoration: const InputDecoration(labelText: 'Count'),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          final val = int.tryParse(controller.text);
+                                          if (val != null && val > 0) {
+                                            Navigator.of(context).pop(val);
+                                          }
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
                               );
+                              if (result != null && result > 0) {
+                                // Add to staged cart
+                                final prod = Product(id: productId, name: productName, price: productPrice);
+                                for (int i = 0; i < result; i++) {
+                                  stagedCart.add(prod);
+                                }
+                                stagedQuantities[productId] = (stagedQuantities[productId] ?? 0) + result;
+                                stagedPercentages[productId] = 0.0;
+                                // Show SnackBar at the top
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('$productName x$result staged. Tap "Go to Percentage" below.'),
+                                    behavior: SnackBarBehavior.floating,
+                                    margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                              }
                             },
-                          );
-                          if (result != null && result > 0) {
-                            // Add to staged cart
-                            final prod = Product(id: productId, name: productName, price: productPrice);
-                            for (int i = 0; i < result; i++) {
-                              stagedCart.add(prod);
-                            }
-                            stagedQuantities[productId] = (stagedQuantities[productId] ?? 0) + result;
-                            stagedPercentages[productId] = 0.0;
-                            // Show SnackBar at the top
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('$productName x$result staged. Tap "Go to Percentage" below.'),
-                                behavior: SnackBarBehavior.floating,
-                                margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
-                                duration: const Duration(seconds: 1),
-                              ),
-                            );
-                          }
-                        },
+                          ),
+                        ),
                       ),
                     );
                   },
@@ -154,9 +192,10 @@ class _SearchPageState extends State<SearchPage> {
           ),
           // New button to go to PercentageScreen
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(left: 20.0,bottom: 20,top: 10),
             child: SizedBox(
-              width: double.infinity,
+              
+              width: 250,
               child: ElevatedButton(
                 onPressed: () async {
                   if (stagedCart.isEmpty) {
@@ -179,12 +218,28 @@ class _SearchPageState extends State<SearchPage> {
                     widget.addToCart(result.first, quantity: 1); // You may want to refactor this for your bill page
                   }
                 },
-                child: const Text('Go to Percentage'),
+                
+                child: Padding(
+                  padding: const EdgeInsets.only(left:5.0),
+                  child: Row(
+                    children: [
+                      const Text('Go to Percentage',style: TextStyle(
+                        color: black,
+                        fontSize: 19
+                      ),),
+                      IconButton(onPressed: () {},
+                       icon: const Icon(Icons.arrow_forward,
+                       color: blue ,
+                       size: 25,))
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
         ],
       ),
+    ),
     );
   }
 }

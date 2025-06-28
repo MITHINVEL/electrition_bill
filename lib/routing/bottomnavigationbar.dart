@@ -1,4 +1,5 @@
 
+import 'package:electrition_bill/core/constant.dart';
 import 'package:electrition_bill/moels/product.dart';
 import 'package:electrition_bill/screens/billscreen.dart';
 import 'package:electrition_bill/screens/home_screen.dart';
@@ -44,47 +45,45 @@ class _BottomnavigationState extends State<Bottomnavigation> {
     return Scaffold(
       body: pagelist[safeIndex],
       bottomNavigationBar: StylishBottomBar(
+        backgroundColor: primary,
         option: AnimatedBarOptions(
           iconStyle: IconStyle.animated,
           barAnimation: BarAnimation.transform3D,
+          
         ),
         iconSpace: 12.0,
         items: [
           BottomBarItem(
-            icon: const Icon(Icons.home),
+            icon: const Icon(Icons.home, size: 35,),
             title: const Text('Home'),
-            selectedColor: Colors.blue,
+            unSelectedColor: white,
+            selectedColor: const Color.fromARGB(237, 142, 33, 243),
           ),
           BottomBarItem(
-            icon: const Icon(Icons.search),
+             unSelectedColor: white,
+            icon: const Icon(Icons.search,size: 30,),
             title: const Text('Search'),
-            selectedColor: Colors.orange,
+            selectedColor: Colors.purpleAccent.shade200, // Changed to a lighter purple
           ),
           BottomBarItem(
-            icon: const Icon(Icons.add),
+             unSelectedColor: white,
+            icon: const Icon(Icons.add,size: 35,),
             title: const Text('Add'),
             selectedColor: Colors.purple,
           ),
           BottomBarItem(
-            icon: const Icon(Icons.credit_card),
+            unSelectedColor: white,
+            icon: const Icon(Icons.credit_card, size: 30,),
             title: const Text('Bill'),
             selectedColor: const Color.fromARGB(255, 39, 41, 176),
           ),
           
    BottomBarItem(
-  icon: CircleAvatar(
-    radius: 28, // Bigger avatar
-    backgroundColor: Colors.white,
-    child: ClipOval(
-      child: Image.asset(
-        'assets/logos/logo.jpg',
-        width: 48,
-        height: 48,
-        fit: BoxFit.cover,
-                   
-                   ),
-                  ),
-                ),
+     unSelectedColor: white,
+  icon:  CircleAvatar(
+                radius: 19,
+                backgroundImage: const AssetImage('assets/images/logos/logo.jpg'),
+              ),
               title: const Text('Profile'),
              selectedColor: Colors.purple,
            ),

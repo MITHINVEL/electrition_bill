@@ -1,8 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseFirestore, QuerySnapshot;
+import 'package:electrition_bill/core/constant.dart';
 import 'package:electrition_bill/moels/product.dart';
-import 'package:electrition_bill/screens/billscreen.dart';
-import 'package:electrition_bill/screens/edit_product_screen.dart';
-import 'package:electrition_bill/widgets/search.dart';
+import 'package:electrition_bill/widgets/animated_lamp_row.dart';
+
+import 'package:electrition_bill/screens/prodect_screen.dart';
+import 'package:electrition_bill/widgets/autoscroll_light.dart';
+import 'package:electrition_bill/widgets/homescreen_auto_scrol_image.dart';
+
 import 'package:flutter/material.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -15,158 +18,132 @@ class ProductListPage extends StatefulWidget {
 }
 
 class _ProductListPageState extends State<ProductListPage> {
-  Set<String> selectedProductIds = {};
-  bool get isSelectionMode => selectedProductIds.isNotEmpty;
-
-  void _toggleSelection(String productId) {
-    setState(() {
-      if (selectedProductIds.contains(productId)) {
-        selectedProductIds.remove(productId);
-      } else {
-        selectedProductIds.add(productId);
-      }
-    });
-  }
-
-  void _clearSelection() {
-    setState(() {
-      selectedProductIds.clear();
-    });
-  }
-
-  Future<void> _deleteSelectedProducts() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Products'),
-        content: const Text('Are you sure you want to delete the selected products?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('No'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Yes'),
-          ),
-        ],
-      ),
-    );
-    if (confirm == true) {
-      for (final id in selectedProductIds.toList()) {
-        await FirebaseFirestore.instance.collection('products').doc(id).delete();
-      }
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selected products deleted!')));
-      _clearSelection();
-    } else {
-      _clearSelection();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Electrition Shop Bill'),
-        backgroundColor: Colors.purple,
+        title: const Text('DURGA ELECTRICALS',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+          fontFamily: 'Roboto',
+        )),
+       backgroundColor: primary,
         actions: [
-          
-          if (isSelectionMode) ...[
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: _deleteSelectedProducts,
-                ),
-              ],
-            ),
-          ],
-          if (!isSelectionMode) ...[
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => SearchPage(cart: widget.cart, addToCart: widget.addToCart),
-                  ),
-                );
-              },
-            ),
-            IconButton(
+          IconButton(
               icon: CircleAvatar(
                 radius: 29,
-                backgroundImage: const AssetImage('assets/logos/logo.jpg'),
+                backgroundImage: const AssetImage('assets/images/logos/logo.jpg'),
               ),
               onPressed: () {},
             ),
-          ],
+          
         ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('products').snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final products = snapshot.data!.docs.map((doc) => Product.fromDoc(doc)).toList();
-          return Column(
+   backgroundColor: white,
+      body:
+       Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: SingleChildScrollView(
+          child: Column(
             children: [
-              if (isSelectionMode)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                  child: Row(
-                    children: [
-                      Checkbox(
-                        value: selectedProductIds.length == products.length && products.isNotEmpty,
-                        onChanged: (checked) {
-                          setState(() {
-                            if (checked == true) {
-                              selectedProductIds = products.map((p) => p.id).toSet();
-                            } else {
-                              selectedProductIds.clear();
-                            }
-                          });
-                        },
+              SizedBox(
+                height: 10,
+              ),
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
+                decoration: BoxDecoration(
+                  color: Colors.pink.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.pink, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.pink.withOpacity(0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ProductStorePage(
+                          cart: widget.cart,
+                          addToCart: widget.addToCart,
+                        ),
                       ),
-                      const Text('Select All'),
+                    );
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'Welcome to Durga Electricals!',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.pink,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'Tap here to view all products and manage your shop inventory.',
+                        style: TextStyle(fontSize: 15, color: Colors.black87),
+                      ),
                     ],
                   ),
                 ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    final isSelected = selectedProductIds.contains(product.id);
-                    return ListTile(
-                      title: Text(product.name),
-                      subtitle: Text('₹${product.price.toStringAsFixed(2)}'),
-                      selected: isSelected,
-                      selectedTileColor: Colors.blue.withOpacity(0.1),
-                      trailing: isSelectionMode
-                          ? (isSelected
-                              ? const Icon(Icons.check_circle, color: Colors.blue)
-                              : const Icon(Icons.radio_button_unchecked, color: Colors.grey))
-                          : null,
-                      onLongPress: () => _toggleSelection(product.id),
-                      onTap: isSelectionMode
-                          ? () => _toggleSelection(product.id)
-                          : () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => EditProductScreen(product: product),
-                                ),
-                              );
-                            },
-                    );
-                  },
+              ),
+                  const SizedBox(height: 15),
+              ShopBannerCarousel(),
+              const SizedBox(height: 10),
+              const Text(
+                'Home Light Collection',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
+                  fontFamily: 'Roboto',
                 ),
               ),
+              const SizedBox(height: 10),
+              // First animation row (first half of stylist lamp images)
+              AnimatedLampRow(
+                imagePaths: [
+                  'assets/images/stylist_lamp/lamp2.jpg',
+                  'assets/images/stylist_lamp/lamp3.jpg',
+                  'assets/images/stylist_lamp/lamp4.jpg',
+                  'assets/images/stylist_lamp/lamp5.jpg',
+                  'assets/images/stylist_lamp/lamp6.jpg',
+                  'assets/images/stylist_lamp/lamp7.jpg',
+                  'assets/images/stylist_lamp/lamp8.jpg',
+                  'assets/images/stylist_lamp/lamp9.jpg',
+                  'assets/images/stylist_lamp/lamp10.jpg',
+                  'assets/images/stylist_lamp/lamp11.jpg',
+                  'assets/images/stylist_lamp/lamp12.jpg',
+                  'assets/images/stylist_lamp/lamp13.jpg',
+                  'assets/images/stylist_lamp/lamp14.jpg',
+                  'assets/images/stylist_lamp/lamp15.jpg',
+                  'assets/images/stylist_lamp/lamp16.jpg',
+                ],
+                animationDelay: 0,
+              ),
+              const SizedBox(height: 20),
+              // Second animation row (second half of stylist lamp images)
+    
+              
             ],
-          );
-        },
+          ),
+        ),
       ),
-    );
+          );
+        
+      
+    
   }
 }

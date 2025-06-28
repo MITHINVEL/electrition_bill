@@ -33,14 +33,36 @@ class _EditProductScreenState extends State<EditProductScreen> {
     final name = nameController.text.trim();
     final price = double.tryParse(priceController.text.trim()) ?? 0.0;
     setState(() { isLoading = true; });
-    await FirebaseFirestore.instance.collection('products').doc(widget.product.id).update({
-      'name': name,
-      'price': price,
-    });
-    setState(() { isLoading = false; });
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product updated!')));
-      Navigator.of(context).pop();
+    try {
+      await FirebaseFirestore.instance.collection('products').doc(widget.product.id).update({
+        'name': name,
+        'price': price,
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product updated!')));
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      debugPrint('Update product error: $e');
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: Text('Failed to update product: $e'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() { isLoading = false; });
+      }
     }
   }
 

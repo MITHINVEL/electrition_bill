@@ -38,7 +38,7 @@ class _PercentageScreenState extends State<PercentageScreen> {
   }
 
   double _calculateDiscountedPrice(double price, double percent) {
-    return price - (price * percent / 100);
+    return price + (price * percent / 100);
   }
 
   void _editProduct(String productId) async {
@@ -292,7 +292,7 @@ class _PercentageScreenState extends State<PercentageScreen> {
                       : null,
                   title: Text(product.name),
                   subtitle: Text(
-                    'Original: ₹${product.price.toStringAsFixed(2)} | Qty: $qty | Discount: ${percent.toStringAsFixed(2)}% | Price: ₹${discountedPrice.toStringAsFixed(2)}',
+                    'Original: ₹${product.price.toStringAsFixed(2)} | Qty: $qty | Percentage: ${percent.toStringAsFixed(2)}% |(After percentage) Price: ₹${discountedPrice.toStringAsFixed(2)}',
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
