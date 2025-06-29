@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:electrition_bill/core/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
@@ -204,11 +205,13 @@ class _DownloadedBillsPageState extends State<DownloadedBillsPage> {
       appBar: AppBar(
         title: _selectionMode
             ? Text('${_selectedIndexes.length} selected')
-            : Text(_filterLabel == 'All' ? 'Downloaded Bills' : '$_filterLabel Downloads (${_filteredBills.length})'),
+            : Text(_filterLabel == 'All' ? 'Downloaded Bills': '$_filterLabel Downloads (${_filteredBills.length})'),
+            backgroundColor: primary,
         actions: [
           if (!_selectionMode)
             PopupMenuButton<String>(
-              icon: Icon(Icons.filter_list),
+              icon: Icon(Icons.filter_list,size: 40,
+              color: black,),
               onSelected: (value) => _applyFilter(value),
               itemBuilder: (context) => [
                 PopupMenuItem(value: 'All', child: Row(children: [Text('All'), Spacer(), Text('${_bills.length}')])) ,

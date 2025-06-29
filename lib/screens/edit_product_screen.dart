@@ -1,3 +1,4 @@
+import 'package:electrition_bill/core/constant.dart';
 import 'package:electrition_bill/moels/product.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -69,19 +70,65 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Product')),
+      appBar: AppBar(
+        
+        title: const Text('Edit Product',
+      style: TextStyle(
+        fontSize: 23,
+        fontWeight: FontWeight.w500,
+      ),),
+      backgroundColor: primary,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Text('🔌 Update Your Item',
+              style: TextStyle(
+                fontSize: 30,
+                color: black,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.bold,
+              )
+              ),
+              
+            const SizedBox(height: 50),
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(labelText: 'Product Name'),
+              decoration: const InputDecoration(labelText: 'Product Name',
+              labelStyle: TextStyle(
+                  fontSize: 25
+                ),
+                prefixIcon: Icon(Icons.search),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: primary,width: 2),
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: yellowColor,width: 2.5),
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                 
+                ),
+              ),
             ),
+            SizedBox(height: 35),
             TextField(
               controller: priceController,
-              decoration: const InputDecoration(labelText: 'Price'),
+              decoration: const InputDecoration(labelText: 'Price',
+              labelStyle: TextStyle(
+                  fontSize: 25
+                ),
+                prefixIcon: Icon(Icons.search),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: primary,width: 2),
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: yellowColor,width: 2.5),
+                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                ),
+              ),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 24),
@@ -92,28 +139,49 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: _updateProduct,
-                          child: const Text('Update'),
+                          child: const Text('Update',style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: black
+                                ),),
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(214, 244, 67, 54)),
                           onPressed: () async {
                             final confirm = await showDialog<bool>(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: const Text('Delete Product'),
-                                content: const Text('Are you sure you want to delete this product?'),
+                                title: const Text('Delete Product',style: TextStyle(
+                                  fontSize: 27,
+                                  fontWeight: FontWeight.w500,
+                                  color: black
+                                ),),
+                                content: const Text('Are you sure you want to delete this product?',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                 
+                                  color: black
+                                ),),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.of(context).pop(false),
-                                    child: const Text('Cancel'),
+                                    child: const Text('Cancel',style: TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color.fromARGB(255, 56, 139, 187)
+                                ),),
                                   ),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                                     onPressed: () => Navigator.of(context).pop(true),
-                                    child: const Text('OK'),
+                                    child: const Text('OK',style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: black
+                                ),),
                                   ),
                                 ],
                               ),
@@ -130,7 +198,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
                               }
                             }
                           },
-                          child: const Text('Delete'),
+                          child: const Text('Delete',style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: black
+                                ),),
                         ),
                       ),
                     ],

@@ -5,7 +5,7 @@ import 'package:electrition_bill/screens/billscreen.dart';
 import 'package:electrition_bill/screens/home_screen.dart';
 import 'package:electrition_bill/screens/prodectaddscreen.dart';
 import 'package:electrition_bill/screens/profile.dart';
-import 'package:electrition_bill/widgets/search.dart';
+import 'package:electrition_bill/screens/search.dart';
 
 
 import 'package:flutter/material.dart';
@@ -73,7 +73,7 @@ class _BottomnavigationState extends State<Bottomnavigation> {
           ),
           BottomBarItem(
             unSelectedColor: white,
-            icon: const Icon(Icons.credit_card, size: 30,),
+            icon: const Icon(Icons.receipt_long, size: 30,),
             title: const Text('Bill'),
             selectedColor: const Color.fromARGB(255, 39, 41, 176),
           ),

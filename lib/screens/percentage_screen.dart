@@ -1,6 +1,8 @@
+import 'package:electrition_bill/core/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:electrition_bill/moels/product.dart';
 import 'package:electrition_bill/screens/billscreen.dart';
+import 'package:collection/collection.dart';
 
 class PercentageScreen extends StatefulWidget {
   final List<Product> products;
@@ -57,16 +59,42 @@ class _PercentageScreenState extends State<PercentageScreen> {
               TextField(
                 controller: qtyController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Quantity'),
+                decoration: const InputDecoration(labelText: 'Quantity',
+                labelStyle: TextStyle(
+                  fontSize: 25
+                ),
+                prefixIcon: Icon(Icons.search),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: primary,width: 2),
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: yellowColor,width: 2.5),
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                 
+                ),),
                 onChanged: (_) {
                   setState(() {}); // force rebuild for total update
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 22),
               TextField(
                 controller: percentController,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'Discount %'),
+                decoration: const InputDecoration(labelText: 'Percentage %',
+                labelStyle: TextStyle(
+                  fontSize: 25
+                ),
+                prefixIcon: Icon(Icons.search),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: primary,width: 2),
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: yellowColor,width: 2.5),
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                 
+                ),),
                 onChanged: (_) {
                   setState(() {}); // force rebuild for total update
                 },
@@ -76,7 +104,13 @@ class _PercentageScreenState extends State<PercentageScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: const Text('Cancel',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: black,
+                  fontFamily: 'Roboto',
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -86,7 +120,13 @@ class _PercentageScreenState extends State<PercentageScreen> {
                   Navigator.of(context).pop({'qty': qty, 'percent': percent});
                 }
               },
-              child: const Text('OK'),
+              child: const Text('OK',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: black,
+                  fontFamily: 'Roboto',
+                ),
+              ),
             ),
           ],
         );
@@ -151,9 +191,15 @@ class _PercentageScreenState extends State<PercentageScreen> {
                 tooltip: 'Select All',
                 onPressed: () {
                   setState(() {
-                    final allSelected = selectedIndices.every((v) => v);
-                    for (int i = 0; i < selectedIndices.length; i++) {
-                      selectedIndices[i] = !allSelected;
+                    final allSelected = quantities.keys.every((productId) {
+                      final idx = widget.products.indexWhere((p) => p.id == productId);
+                      return idx != -1 && selectedIndices[idx];
+                    });
+                    for (final productId in quantities.keys) {
+                      final idx = widget.products.indexWhere((p) => p.id == productId);
+                      if (idx != -1) {
+                        selectedIndices[idx] = !allSelected;
+                      }
                     }
                   });
                 },
@@ -173,11 +219,21 @@ class _PercentageScreenState extends State<PercentageScreen> {
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.of(context).pop(false),
-                                  child: const Text('No'),
+                                  child: const Text('No',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: black,
+                                      fontFamily: 'Roboto',
+                                  )),
                                 ),
                                 ElevatedButton(
                                   onPressed: () => Navigator.of(context).pop(true),
-                                  child: const Text('Yes'),
+                                  child: const Text('Yes',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: black,
+                                      fontFamily: 'Roboto',
+                                  )),
                                 ),
                               ],
                             ),
@@ -186,8 +242,12 @@ class _PercentageScreenState extends State<PercentageScreen> {
                             setState(() {
                               for (int i = selectedIndices.length - 1; i >= 0; i--) {
                                 if (selectedIndices[i]) {
+                                  final productId = widget.products[i].id;
                                   widget.products.removeAt(i);
                                   selectedIndices.removeAt(i);
+                                  quantities.remove(productId);
+                                  percentages.remove(productId);
+                                  discountedPrices.remove(productId);
                                 }
                               }
                               _syncSelectedIndices();
@@ -209,14 +269,34 @@ class _PercentageScreenState extends State<PercentageScreen> {
                               return AlertDialog(
                                 title: const Text('Set Discount % for Selected'),
                                 content: TextField(
+                                  autofocus: true,
                                   controller: percentController,
                                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                  decoration: const InputDecoration(labelText: 'Discount %'),
+                                  decoration: const InputDecoration(labelText: 'percentage %',
+                                  labelStyle: TextStyle(
+                                 fontSize: 25
+                               ),
+                               prefixIcon: Icon(Icons.search),
+                               enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: primary,width: 2),
+                               borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                 ),
+                                   focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: yellowColor,width: 2.5),
+                                   borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                 
+                                  ),
+                                   ),
                                 ),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.of(context).pop(),
-                                    child: const Text('Cancel'),
+                                    child: const Text('Cancel',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: black,
+                                        fontFamily: 'Roboto',
+                                      ),)
                                   ),
                                   ElevatedButton(
                                     onPressed: () {
@@ -225,7 +305,13 @@ class _PercentageScreenState extends State<PercentageScreen> {
                                         Navigator.of(context).pop(percent);
                                       }
                                     },
-                                    child: const Text('OK'),
+                                    child: const Text('OK',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: black,
+                                        fontFamily: 'Roboto',
+                                      ),
+                                    ),
                                   ),
                                 ],
                               );
@@ -248,29 +334,32 @@ class _PercentageScreenState extends State<PercentageScreen> {
             )
           : AppBar(
               title: const Text('Select Products & Discount'),
+              backgroundColor: primary,
             ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: widget.products.length,
+              itemCount: quantities.length, // Only unique product IDs
               itemBuilder: (context, index) {
-                final product = widget.products[index];
-                final isSelected = selectedIndices[index];
-                final qty = quantities[product.id] ?? 1;
-                final percent = percentages[product.id] ?? 0.0;
-                final discountedPrice = discountedPrices[product.id] ?? product.price;
+                final productId = quantities.keys.elementAt(index);
+                final product = widget.products.firstWhereOrNull((p) => p.id == productId) ?? Product(id: productId, name: 'Unknown', price: 0);
+                final idx = widget.products.indexWhere((p) => p.id == productId);
+                final isSelected = idx != -1 ? selectedIndices[idx] : false;
+                final qty = quantities[productId] ?? 1;
+                final percent = percentages[productId] ?? 0.0;
+                final discountedPrice = discountedPrices[productId] ?? product.price;
                 return ListTile(
                   onLongPress: () {
                     setState(() {
                       selectionMode = true;
-                      selectedIndices[index] = true;
+                      if (idx != -1) selectedIndices[idx] = true;
                     });
                   },
                   onTap: selectionMode
                       ? () {
                           setState(() {
-                            selectedIndices[index] = !selectedIndices[index];
+                            if (idx != -1) selectedIndices[idx] = !selectedIndices[idx];
                             if (selectedIndices.every((v) => !v)) {
                               selectionMode = false;
                             }
@@ -282,7 +371,7 @@ class _PercentageScreenState extends State<PercentageScreen> {
                           value: isSelected,
                           onChanged: (val) {
                             setState(() {
-                              selectedIndices[index] = val ?? false;
+                              if (idx != -1) selectedIndices[idx] = val ?? false;
                               if (selectedIndices.every((v) => !v)) {
                                 selectionMode = false;
                               }
@@ -328,36 +417,55 @@ class _PercentageScreenState extends State<PercentageScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Total:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    const Text('Total:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
                     Text(
                       '₹' + _calculateGrandTotal().toStringAsFixed(2),
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 30,
+                      color: Colors.green
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 18),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Build new product list with updated price and quantity for all products
-                      final List<Product> finalProducts = [];
-                      for (var p in widget.products) {
-                        final qty = quantities[p.id] ?? 1;
-                        final percent = percentages[p.id] ?? 0.0;
-                        final price = _calculateDiscountedPrice(p.price, percent);
-                        for (int i = 0; i < qty; i++) {
-                          finalProducts.add(Product(id: p.id, name: p.name, price: price));
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 50.0,right: 50,bottom: 20),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Build new product list with updated price and quantity for all products
+                        final List<Product> finalProducts = [];
+                        for (var p in widget.products) {
+                          final qty = quantities[p.id] ?? 1;
+                          final percent = percentages[p.id] ?? 0.0;
+                          final price = _calculateDiscountedPrice(p.price, percent);
+                          for (int i = 0; i < qty; i++) {
+                            finalProducts.add(Product(id: p.id, name: p.name, price: price));
+                          }
                         }
-                      }
-                      // Navigate to BillPage directly
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => BillPage(cart: finalProducts),
+                        // Navigate to BillPage directly
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => BillPage(cart: finalProducts),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 30.0, right: 30.0,top: 5, bottom: 5),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Go to Bill',
+                              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold,
+                              color: black
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Icon(Icons.arrow_forward, size: 30, color: Colors.blue),
+                          ],
                         ),
-                      );
-                    },
-                    child: const Text('Go to Bill'),
+                      ),
+                    ),
                   ),
                 ),
               ],

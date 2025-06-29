@@ -20,21 +20,25 @@ class _DownloadedBillsButtonState extends State<DownloadedBillsButton> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TextButton.icon(
-          icon: const Icon(Icons.folder,color: Color.fromARGB(255, 219, 223, 11),size:30,),
-
-          label: const Text('Show Downloaded Bills',style: TextStyle(
-            color: Colors.black,
-            fontSize: 20),),
-          onPressed: _loading
-              ? null
-              : () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const DownloadedBillsPage(),
-                    ),
-                  );
-                },
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 77.0, top: 8.0),
+          child: TextButton.icon(
+            icon: const Icon(Icons.folder,color: Color.fromARGB(255, 219, 223, 11),
+            size:30,),
+          
+            label: const Text('Show Downloaded Bills..?',style: TextStyle(
+              color: Colors.black,
+              fontSize: 20),),
+            onPressed: _loading
+                ? null
+                : () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const DownloadedBillsPage(),
+                      ),
+                    );
+                  },
+          ),
         ),
        
       ],

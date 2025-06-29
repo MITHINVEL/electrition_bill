@@ -18,7 +18,7 @@ class ElectritionBillApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'DURGA ELECTRICALS',
+      title: 'Durga Electricals',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
@@ -28,15 +28,37 @@ class ElectritionBillApp extends StatelessWidget {
   }
 }
 
-// Add a function to check if the latest bill file exists in external storage
+// Utility to get the Downloads directory on Android, fallback to app docs on iOS/other
+Future<Directory?> getDownloadsDirectory() async {
+  if (Platform.isAndroid) {
+    final dirs = await getExternalStorageDirectories(type: StorageDirectory.downloads);
+    if (dirs != null && dirs.isNotEmpty) {
+      return dirs.first;
+    } else {
+      // Fallback to /storage/emulated/0/Download if possible
+      final dir = Directory('/storage/emulated/0/Download');
+      if (await dir.exists()) return dir;
+      try {
+        await dir.create(recursive: true);
+        return dir;
+      } catch (_) {
+        // Fallback to app-specific
+        return await getExternalStorageDirectory();
+      }
+    }
+  } else {
+    return await getApplicationDocumentsDirectory();
+  }
+}
+
+// Check if the latest bill file exists in Downloads
 Future<bool> checkLatestBillFileExists(String extension) async {
-  final output = await getExternalStorageDirectory();
-  if (output == null) {
-    debugPrint('Error: getExternalStorageDirectory() returned null');
+  final downloadsDir = await getDownloadsDirectory();
+  if (downloadsDir == null) {
+    debugPrint('Error: getDownloadsDirectory() returned null');
     return false;
   }
-  final dir = Directory(output.path);
-  final files = dir.listSync().whereType<File>().where((f) => f.path.endsWith(extension)).toList();
+  final files = downloadsDir.listSync().whereType<File>().where((f) => f.path.endsWith(extension)).toList();
   if (files.isEmpty) return false;
   files.sort((a, b) => b.statSync().modified.compareTo(a.statSync().modified));
   return files.first.existsSync();
@@ -45,17 +67,7 @@ Future<bool> checkLatestBillFileExists(String extension) async {
 
 
 Future<File?> getLatestBillFile(String extension) async {
-  Directory? downloadsDir;
-  if (Platform.isAndroid) {
-    final dirs = await getExternalStorageDirectories(type: StorageDirectory.downloads);
-    if (dirs != null && dirs.isNotEmpty) {
-      downloadsDir = dirs.first;
-    } else {
-      downloadsDir = await getExternalStorageDirectory();
-    }
-  } else {
-    downloadsDir = await getApplicationDocumentsDirectory();
-  }
+  final downloadsDir = await getDownloadsDirectory();
   if (downloadsDir == null) return null;
   final files = downloadsDir
       .listSync()

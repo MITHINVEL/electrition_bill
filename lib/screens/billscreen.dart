@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:electrition_bill/contents/assets.dart';
+import 'package:electrition_bill/core/constant.dart';
 import 'package:electrition_bill/moels/product.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -147,10 +147,19 @@ class _BillPageState extends State<BillPage> {
     });
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bill'),
+        title: Center(
+          child: const Text('Download Bill',style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 25,
+          ),),
+        ),
+        backgroundColor: primary,
         actions: [
           IconButton(
-            icon: const Icon(Icons.download),
+            icon: const Icon(Icons.download,
+            size:33,
+            color:Color.fromARGB(178, 182, 17, 223),
+            ),
             tooltip: 'Download Bill',
             onPressed: () async {
               bool granted = await _requestStoragePermission();
@@ -163,7 +172,7 @@ class _BillPageState extends State<BillPage> {
               // PDF bill generation (use current productCounts/prices)
               final pdf = pw.Document();
               // Load background image
-              final bgImageBytes = await rootBundle.load(LogosAssets.pdfBackground);
+              final bgImageBytes = await rootBundle.load('assets/images/logos/pdfbackground.jpg');
               final bgImage = pw.MemoryImage(bgImageBytes.buffer.asUint8List());
               final now = DateTime.now();
               final formattedDate = DateFormat('dd-MM-yyyy').format(now);
@@ -355,166 +364,280 @@ class _BillPageState extends State<BillPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: widget.cart.toSet().length,
-              itemBuilder: (context, index) {
-                final uniqueProducts = widget.cart.toSet().toList();
-                final product = uniqueProducts[index];
-                final count = productCounts[product.id] ?? 1;
-                final totalProduct = (productPrices[product.id] ?? product.price) * count;
-                if (!productCounts.containsKey(product.id)) {
-                  return const SizedBox.shrink();
-                }
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                  child: Row(
-                    children: [
-                      
-                      Expanded(
-                        flex: 8,
-                        child: GestureDetector(
-                          onTap: () async {
-                            final countController = TextEditingController(text: count.toString());
-                            final priceController = TextEditingController(text: (productPrices[product.id] ?? product.price).toStringAsFixed(2));
-                            final result = await showDialog<Map<String, dynamic>>(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text('Edit ${product.name}'),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextField(
-                                        controller: countController,
-                                        keyboardType: TextInputType.number,
-                                        autofocus: true,
-                                        decoration: const InputDecoration(labelText: 'Count'),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 10.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: productCounts.length, // Only unique product IDs
+                itemBuilder: (context, index) {
+                  final productId = productCounts.keys.elementAt(index);
+                  final product = widget.cart.firstWhere((p) => p.id == productId);
+                  final count = productCounts[productId] ?? 1;
+                  final totalProduct = (productPrices[productId] ?? product.price) * count;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
+                    child: Card(
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 1.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 6,
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final countController = TextEditingController(text: count.toString());
+                                  final priceController = TextEditingController(text: (productPrices[productId] ?? product.price).toStringAsFixed(2));
+                                  final result = await showDialog<Map<String, dynamic>>(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text('Edit \n${product.name}'),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            TextField(
+                                              controller: countController,
+                                              keyboardType: TextInputType.number,
+                                              autofocus: true,
+                                              decoration: const InputDecoration(labelText: 'Count',
+                                                labelStyle: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontFamily: 'Roboto',
+                                                  fontSize: 20,
+                                                ),
+                                                enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(color: primary,width: 2),
+                                                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                                ),
+                                                focusedBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(color: yellowColor,width: 2.5),
+                                                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 18),
+                                            TextField(
+                                              controller: priceController,
+                                              keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                              decoration: const InputDecoration(labelText: 'Price',
+                                                labelStyle: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontFamily: 'Roboto',
+                                                  fontSize: 20,
+                                                ),
+                                                enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(color: primary,width: 2),
+                                                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                                ),
+                                                focusedBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(color: yellowColor,width: 2.5),
+                                                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(),
+                                            child: const Text('Cancel',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                                color: black,
+                                              ),
+                                            ),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              final val = int.tryParse(countController.text);
+                                              final priceVal = double.tryParse(priceController.text);
+                                              if (val != null && val > 0 && priceVal != null && priceVal > 0) {
+                                                Navigator.of(context).pop({'count': val, 'price': priceVal});
+                                              }
+                                            },
+                                            child: const Text('OK',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                                color: black,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                  if (result != null && result['count'] != null && result['price'] != null) {
+                                    _updateCount(product.id, result['count']);
+                                    setState(() {
+                                      productPrices[product.id] = result['price'];
+                                    });
+                                  }
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      product.name,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                        color: black,
+                                        fontFamily: 'Roboto',
+                                        letterSpacing: 1.2,
                                       ),
-                                      const SizedBox(height: 12),
-                                      TextField(
-                                        controller: priceController,
-                                        keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                        decoration: const InputDecoration(labelText: 'Price'),
-                                      ),
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.of(context).pop(),
-                                      child: const Text('Cancel'),
                                     ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        final val = int.tryParse(countController.text);
-                                        final priceVal = double.tryParse(priceController.text);
-                                        if (val != null && val > 0 && priceVal != null && priceVal > 0) {
-                                          Navigator.of(context).pop({'count': val, 'price': priceVal});
-                                        }
-                                      },
-                                      child: const Text('OK'),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      '₹${(productPrices[productId] ?? product.price).toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color.fromARGB(221, 18, 144, 202),
+                                      ),
                                     ),
                                   ],
-                                );
-                              },
-                            );
-                            if (result != null && result['count'] != null && result['price'] != null) {
-                              _updateCount(product.id, result['count']);
-                              setState(() {
-                                productPrices[product.id] = result['price'];
-                              });
-                            }
-                          },
-                          child: Text(
-                            '${product.name}\n₹${(productPrices[product.id] ?? product.price).toStringAsFixed(2)}',
-                            style: const TextStyle(fontSize: 16, decoration: TextDecoration.underline, color: Colors.blue),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Center(
-                          child: GestureDetector(
-                            onTap: () async {
-                              final controller = TextEditingController(text: count.toString());
-                              final newCount = await showDialog<int>(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text('Edit Count for ${product.name}'),
-                                    content: TextField(
-                                      controller: controller,
-                                      keyboardType: TextInputType.number,
-                                      autofocus: true,
-                                      decoration: const InputDecoration(labelText: 'Count'),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.of(context).pop(),
-                                        child: const Text('Cancel'),
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          final val = int.tryParse(controller.text);
-                                          if (val != null && val > 0) {
-                                            Navigator.of(context).pop(val);
-                                          }
-                                        },
-                                        child: const Text('OK'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                              if (newCount != null && newCount > 0) {
-                                _updateCount(product.id, newCount);
-                              }
-                            },
-                            child: Text(
-                              'x$count',
-                              style: const TextStyle(fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                              color: Colors.blue),
+                                ),
+                              ),
                             ),
-                          ),
+                            Expanded(
+                              flex: 2,
+                              child: Center(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final controller = TextEditingController(text: count.toString());
+                                    final newCount = await showDialog<int>(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: Text('Edit Count \n${product.name}',
+                                              style: TextStyle(color: black,fontFamily: 'Roboto', fontSize: 20)),
+                                          content: TextField(
+                                            controller: controller,
+                                            keyboardType: TextInputType.number,
+                                            autofocus: true,
+                                            decoration: InputDecoration(
+                                              labelText: 'Count',
+                                              labelStyle: const TextStyle(
+                                                color: Colors.grey,
+                                                fontFamily: 'Roboto',
+                                                fontSize: 20,
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderSide: const BorderSide(color: primary, width: 2),
+                                                borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: const BorderSide(color: yellowColor, width: 2.5),
+                                                borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                                              ),
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.of(context).pop(),
+                                              child: const Text('Cancel',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                  color: black,
+                                                ),
+                                              ),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                final val = int.tryParse(controller.text);
+                                                if (val != null && val > 0) {
+                                                  Navigator.of(context).pop(val);
+                                                }
+                                              },
+                                              child: const Text('OK',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                  color: black,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                    if (newCount != null && newCount > 0) {
+                                      _updateCount(product.id, newCount);
+                                    }
+                                  },
+                                  
+                                  child: Text(
+                                    'x$count',
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,
+                                      color: Color(0xFF1976D2),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  '₹${totalProduct.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF388E3C),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red, size: 28),
+                              onPressed: () {
+                                _removeProductAt(index);
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      Expanded(
-                        flex: 3,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            '₹${totalProduct.toStringAsFixed(2)}',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          _removeProductAt(index);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Total:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                Text('₹${total.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              ],
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom:   30.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26)),
+                   Text(
+                       '₹' + productCounts.entries.fold(0.0, (sum, entry) {
+                     final price = productPrices[entry.key] ?? 0.0;
+                      return sum + price * entry.value;
+                       }).toStringAsFixed(2),
+                      style: const TextStyle(
+                       fontWeight: FontWeight.bold,
+                      fontSize: 26,
+                           color: Colors.green,
+                     ),
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,5 @@
 class LogosAssets {
-  static const String images = 'assets/logos/';
+  static const String images = 'assets/images/logos/';
   static const String logo = '$images/logo.jpg';
   static const String pdfBackground = '$images/pdfbackground.jpg';
 }

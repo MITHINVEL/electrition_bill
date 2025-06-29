@@ -1,0 +1,8 @@
+dev_dependencies:
+  flutter_native_splash: ^2.3.10
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/images/png_images/durga_electricals.jpg
+  android: true
+  ios: true

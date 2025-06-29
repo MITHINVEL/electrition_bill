@@ -92,7 +92,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: AppBar(title: const Text('Add Product'),
+        appBar: AppBar(
+        title: const Text('Add Product',
+        style: TextStyle(
+          fontSize: 30,
+          color: black
+        ),),
           backgroundColor: primary,
           actions: [
             IconButton(

@@ -23,4 +23,7 @@ class Product {
       price: (data['price'] as num?)?.toDouble() ?? 0.0,
     );
   }
+
+  // Add a static list for demo/testing. Replace with your actual product list source.
+  static List<Product> demoList = [];
 }

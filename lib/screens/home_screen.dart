@@ -1,11 +1,8 @@
 import 'package:electrition_bill/core/constant.dart';
 import 'package:electrition_bill/moels/product.dart';
 import 'package:electrition_bill/widgets/animated_lamp_row.dart';
-
 import 'package:electrition_bill/screens/prodect_screen.dart';
-import 'package:electrition_bill/widgets/autoscroll_light.dart';
 import 'package:electrition_bill/widgets/homescreen_auto_scrol_image.dart';
-
 import 'package:flutter/material.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -23,7 +20,7 @@ class _ProductListPageState extends State<ProductListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('DURGA ELECTRICALS',
+        title: const Text('DURGA  ELECTRICALS',
         style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 20,
@@ -36,7 +33,8 @@ class _ProductListPageState extends State<ProductListPage> {
                 radius: 29,
                 backgroundImage: const AssetImage('assets/images/logos/logo.jpg'),
               ),
-              onPressed: () {},
+              onPressed: () {
+              },
             ),
           
         ],
@@ -99,9 +97,9 @@ class _ProductListPageState extends State<ProductListPage> {
                   ),
                 ),
               ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 10),
               ShopBannerCarousel(),
-              const SizedBox(height: 10),
+              const SizedBox(height: 25),
               const Text(
                 'Home Light Collection',
                 style: TextStyle(
@@ -111,7 +109,7 @@ class _ProductListPageState extends State<ProductListPage> {
                   fontFamily: 'Roboto',
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
               // First animation row (first half of stylist lamp images)
               AnimatedLampRow(
                 imagePaths: [

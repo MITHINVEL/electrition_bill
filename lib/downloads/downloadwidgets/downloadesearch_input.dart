@@ -1,3 +1,4 @@
+import 'package:electrition_bill/core/constant.dart';
 import 'package:flutter/material.dart';
 
 class DownloadeSearchInput extends StatefulWidget {
@@ -44,19 +45,35 @@ class _DownloadeSearchInputState extends State<DownloadeSearchInput> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: _controller,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.search),
-        suffixIcon: IconButton(
-          icon: const Icon(Icons.calendar_today),
-          onPressed: _pickDate,
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: TextField(
+        controller: _controller,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.calendar_today),
+            onPressed: _pickDate,
+          ),
+          hintText: widget.hintText,
+          labelStyle: TextStyle(
+                    fontSize: 25
+                  ),
+                
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: primary,width: 2),
+                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: yellowColor,width: 2.5),
+                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                   
+                  ),
+          
         ),
-        hintText: widget.hintText,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        onChanged: widget.onSearch,
       ),
-      onChanged: widget.onSearch,
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:electrition_bill/core/constant.dart';
 import 'package:electrition_bill/moels/product.dart';
-import 'package:electrition_bill/widgets/percentage_screen.dart';
+import 'package:electrition_bill/screens/percentage_screen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,9 +20,6 @@ class _SearchPageState extends State<SearchPage> {
   final FocusNode _searchFocus = FocusNode();
   final TextEditingController _searchController = TextEditingController();
 
-  // --- New logic for staged cart and percentage screen ---
-  // Move stagedCart, stagedQuantities, stagedPercentages to class-level fields
-  // so they persist across rebuilds
   List<Product> stagedCart = [];
   Map<String, int> stagedQuantities = {};
   Map<String, double> stagedPercentages = {};
@@ -59,6 +56,7 @@ class _SearchPageState extends State<SearchPage> {
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: TextField(
+              autofocus: true,
               focusNode: _searchFocus,
               controller: _searchController,
               decoration: const InputDecoration(
@@ -72,7 +70,7 @@ class _SearchPageState extends State<SearchPage> {
                   borderRadius: BorderRadius.all(Radius.circular(20.0)),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: yellowColor,width: 2),
+                  borderSide: BorderSide(color: yellowColor,width: 2.5),
                   borderRadius: BorderRadius.all(Radius.circular(20.0)),
                  
                 ),
@@ -131,22 +129,51 @@ class _SearchPageState extends State<SearchPage> {
                             color: blue, // Changed to blue for consistency
                             ),
                             onPressed: () async {
+                              int initialCount = stagedQuantities[productId] ?? 1;
                               final result = await showDialog<int>(
                                 context: context,
                                 builder: (context) {
-                                  final controller = TextEditingController(text: '1');
+                                  final controller = TextEditingController(
+                                    text: initialCount.toString()
+                                  );
+                                  // Automatically select all text so typing replaces it
+                                  controller.selection = TextSelection(baseOffset: 0, extentOffset: controller.text.length);
                                   return AlertDialog(
                                     title: Text(productName),
                                     content: TextField(
                                       autofocus: true,
                                       keyboardType: TextInputType.number,
                                       controller: controller,
-                                      decoration: const InputDecoration(labelText: 'Count'),
+                                      decoration: const InputDecoration(labelText: 'Count',
+                                      labelStyle: TextStyle(
+                                fontSize: 25
+                                       ),
+                                  prefixIcon: Icon(Icons.search),
+                                          enabledBorder: OutlineInputBorder(
+                                   borderSide: BorderSide(color: primary,width: 2),
+                                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                                    focusedBorder: OutlineInputBorder(
+                                       borderSide: BorderSide(color: yellowColor,width: 2.5),
+                                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                          
+                ),
+                                      ),
+                                      onChanged: (val) {
+                                        controller.value = controller.value.copyWith(
+                                          text: val,
+                                          selection: TextSelection.collapsed(offset: val.length),
+                                        );
+                                      },
                                     ),
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.of(context).pop(),
-                                        child: const Text('Cancel'),
+                                        child: const Text('Cancel',style: TextStyle(
+                                          color: black,
+                                          fontFamily: 'Roboto',
+                                          fontSize: 20
+                                        ),),
                                       ),
                                       ElevatedButton(
                                         onPressed: () {
@@ -155,19 +182,25 @@ class _SearchPageState extends State<SearchPage> {
                                             Navigator.of(context).pop(val);
                                           }
                                         },
-                                        child: const Text('OK'),
+                                        child: const Text('OK',style: TextStyle(
+                                          color: black,
+                                          fontFamily: 'Roboto',
+                                          fontSize: 20
+                                        ),),
                                       ),
                                     ],
                                   );
                                 },
                               );
                               if (result != null && result > 0) {
-                                // Add to staged cart
+                                // Remove all previous of this product from stagedCart
+                                stagedCart.removeWhere((p) => p.id == productId);
+                                // Add the new count
                                 final prod = Product(id: productId, name: productName, price: productPrice);
                                 for (int i = 0; i < result; i++) {
                                   stagedCart.add(prod);
                                 }
-                                stagedQuantities[productId] = (stagedQuantities[productId] ?? 0) + result;
+                                stagedQuantities[productId] = result;
                                 stagedPercentages[productId] = 0.0;
                                 // Show SnackBar at the top
                                 ScaffoldMessenger.of(context).showSnackBar(
