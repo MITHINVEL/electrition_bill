@@ -6,3 +6,6 @@ flutter_native_splash:
   image: assets/images/png_images/durga_electricals.jpg
   android: true
   ios: true
+  branding: assets/images/png_images/branding_mithinvel.jpg
+  branding_mode: bottom
+  fullscreen: true

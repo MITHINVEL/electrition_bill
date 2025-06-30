@@ -33,36 +33,148 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void _updateProduct() async {
     final name = nameController.text.trim();
     final price = double.tryParse(priceController.text.trim()) ?? 0.0;
-    setState(() { isLoading = true; });
-    try {
-      await FirebaseFirestore.instance.collection('products').doc(widget.product.id).update({
-        'name': name,
-        'price': price,
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product updated!')));
-        Navigator.of(context).pop();
-      }
-    } catch (e) {
-      debugPrint('Update product error: $e');
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text('Failed to update product: $e'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK'),
+    // Ask for 4-digit password before update
+    String? passwordResult = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        final controller = TextEditingController();
+        String? errorText;
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Enter 4-digit Password'),
+              content: TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  labelStyle: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 20,
+                    fontFamily: 'Roboto',
+                  ),
+                  errorText: errorText,
+                  counterText: '',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: errorText != null ? Colors.red : const Color.fromARGB(255, 216, 213, 183),
+                      width: 2,
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(20.0)
+                  ),),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: errorText != null ? Colors.red : yellowColor,
+                      width: 2,
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                  ),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: errorText != null ? Colors.red : primary,
+                      width: 2,
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: errorText != null ? Colors.red : yellowColor,
+                      width: 2.5,
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                  ),
+                ),
+                style: TextStyle(
+                  color: errorText != null ? Colors.red : Colors.black,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 8,
+                  fontSize: 24,
+                ),
+                onChanged: (val) {
+                  setState(() {
+                    errorText = null;
+                  });
+                },
+                autofocus: true,
+                textAlign: TextAlign.center,
               ),
-            ],
-          ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: black,
+                    fontFamily: 'Roboto',
+                  ),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: () {
+                    if (controller.text == '7373') {
+                      Navigator.of(context).pop(controller.text);
+                    } else {
+                      setState(() {
+                        errorText = 'Password incorrect';
+                      });
+                    }
+                  },
+                  child: const Text('Confirm',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: black,
+                    fontFamily: 'Roboto',
+                  ),
+                  ),
+                ),
+              ],
+            );
+          },
         );
+      },
+    );
+    if (passwordResult == '7373') {
+      setState(() { isLoading = true; });
+      try {
+        await FirebaseFirestore.instance.collection('products').doc(widget.product.id).update({
+          'name': name,
+          'price': price,
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product updated!')));
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        debugPrint('Update product error: $e');
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Error'),
+              content: Text('Failed to update product: $e'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() { isLoading = false; });
+        }
       }
-    } finally {
+    } else if (passwordResult != null) {
       if (mounted) {
-        setState(() { isLoading = false; });
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password incorrect. Update cancelled.')));
       }
     }
   }
@@ -187,14 +299,126 @@ class _EditProductScreenState extends State<EditProductScreen> {
                               ),
                             );
                             if (confirm == true) {
-                              setState(() { isLoading = true; });
-                              await FirebaseFirestore.instance.collection('products').doc(widget.product.id).delete();
-                              setState(() { isLoading = false; });
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Product deleted!')),
-                                );
-                                Navigator.of(context).pop();
+                              // Ask for 4-digit password before delete
+                              String? passwordResult = await showDialog<String>(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) {
+                                  final controller = TextEditingController();
+                                  String? errorText;
+                                  return StatefulBuilder(
+                                    builder: (context, setState) {
+                                      return AlertDialog(
+                                        title: const Text('Enter 4-digit Password'),
+                                        content: TextField(
+                                          controller: controller,
+                                          keyboardType: TextInputType.number,
+                                          maxLength: 4,
+                                          obscureText: true,
+                                          decoration: InputDecoration(
+                                            labelText: 'Password',
+                                            labelStyle: const TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 20,
+                                              fontFamily: 'Roboto',
+                                            ),
+                                            errorText: errorText,
+                                            counterText: '',
+                                            errorBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: errorText != null ? Colors.red : const Color.fromARGB(255, 216, 213, 183),
+                                                width: 2,
+                                              ),
+                                              borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                                            ),
+                                            focusedErrorBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: errorText != null ? Colors.red : yellowColor,
+                                                width: 2,
+                                              ),
+                                              borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                                            ),
+                                            border: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: errorText != null ? Colors.red : primary,
+                                                width: 2,
+                                              ),
+                                              borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: errorText != null ? Colors.red : yellowColor,
+                                                width: 2.5,
+                                              ),
+                                              borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                          style: TextStyle(
+                                            color: errorText != null ? Colors.red : Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 8,
+                                            fontSize: 24,
+                                          ),
+                                          onChanged: (val) {
+                                            setState(() {
+                                              errorText = null;
+                                            });
+                                          },
+                                          autofocus: true,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(),
+                                            child: const Text('Cancel',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500,
+                                              color: black,
+                                              fontFamily: 'Roboto',),
+                                            ),
+                                          ),
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                            onPressed: () {
+                                              if (controller.text == '7373') {
+                                                Navigator.of(context).pop(controller.text);
+                                              } else {
+                                                setState(() {
+                                                  errorText = 'Password incorrect';
+                                                });
+                                              }
+                                            },
+                                            child: const Text('Confirm',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500,
+                                              color: black,
+                                              fontFamily: 'Roboto',),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                              if (passwordResult == '7373') {
+                                setState(() { isLoading = true; });
+                                await FirebaseFirestore.instance.collection('products').doc(widget.product.id).delete();
+                                setState(() { isLoading = false; });
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Product deleted!')),
+                                  );
+                                  Navigator.of(context).pop();
+                                }
+                              } else if (passwordResult != null) {
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Password incorrect. Deletion cancelled.')),
+                                  );
+                                }
                               }
                             }
                           },

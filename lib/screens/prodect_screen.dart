@@ -72,27 +72,143 @@ class _ProductStorePageState extends State<ProductStorePage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('No'),
+            child: const Text('No',style: TextStyle(color: Colors.black,
+            fontSize: 20, fontWeight: FontWeight.w500, 
+            fontFamily: 'Roboto'
+            ),),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Yes'),
+            child: const Text('Yes',style: TextStyle(color: Colors.black,
+            fontSize: 20, fontWeight: FontWeight.w500, 
+            fontFamily: 'Roboto'
+            ),),
           ),
         ],
       ),
     );
     if (confirm == true) {
-      // Delete from Firestore and local list
-      for (final id in selectedProductIds.toList()) {
-        try {
-          await FirebaseFirestore.instance.collection('products').doc(id).delete();
-        } catch (e) {
-          debugPrint('Failed to delete product $id: $e');
+      // Ask for 4-digit password
+      String? passwordResult = await showDialog<String>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          final controller = TextEditingController();
+          String? errorText;
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                title: const Text('Enter 4-digit Password'),
+                content: TextField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  maxLength: 4,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    labelStyle: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 20,
+                      fontFamily: 'Roboto',
+                    ),
+                    errorText: errorText,
+                    counterText: '',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: errorText != null ? Colors.red : primary,
+                        width: 2,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: errorText != null ? Colors.red : primary,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(20)
+                    ),
+                    focusedErrorBorder:OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: errorText != null ? Colors.red : primary,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(20)
+                    ) ,
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: errorText != null ? Colors.red : yellowColor,
+                        width: 2.5,
+                      ),
+                      borderRadius: BorderRadius.circular(20)
+                    ),
+                  ),
+                  style: TextStyle(
+                    color: errorText != null ? Colors.red : Colors.black,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 8,
+                    fontSize: 24,
+                  ),
+                  onChanged: (val) {
+                    setState(() {
+                      errorText = null;
+                    });
+                  },
+                  autofocus: true,
+                  textAlign: TextAlign.center,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel',style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Roboto'
+                    ),),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    onPressed: () {
+                      if (controller.text == '7373') {
+                        Navigator.of(context).pop(controller.text);
+                      } else {
+                        setState(() {
+                          errorText = 'Password incorrect';
+                        });
+                      }
+                    },
+                    child: const Text('Confirm',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                      fontFamily: 'Roboto',),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+      if (passwordResult == '7373') {
+        // Delete from Firestore and local list
+        for (final id in selectedProductIds.toList()) {
+          try {
+            await FirebaseFirestore.instance.collection('products').doc(id).delete();
+          } catch (e) {
+            debugPrint('Failed to delete product $id: $e');
+          }
         }
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selected products deleted!')));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selected products deleted!')));
+          _clearSelection();
+        }
+      } else if (passwordResult != null) {
+        // Wrong password, show error
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password incorrect. Deletion cancelled.')));
+        }
         _clearSelection();
       }
     } else {
@@ -117,7 +233,7 @@ class _ProductStorePageState extends State<ProductStorePage> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    icon: const Icon(Icons.delete, color: Colors.red,size: 28,),
                     onPressed: _deleteSelectedProducts,
                   ),
                 ],

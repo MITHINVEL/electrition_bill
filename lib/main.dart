@@ -1,4 +1,5 @@
 import 'package:electrition_bill/routing/bottomnavigationbar.dart';
+import 'package:electrition_bill/splah_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'dart:io';
@@ -23,7 +24,7 @@ class ElectritionBillApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const Bottomnavigation(), // Use Bottomnavigation as the home page
+      home: const CustomSplashScreen(), // Show splash first
     );
   }
 }
@@ -79,5 +80,4 @@ Future<File?> getLatestBillFile(String extension) async {
   return files.first;
 }
 
-
-
+// Add the custom splash screen widget

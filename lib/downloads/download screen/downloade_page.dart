@@ -51,6 +51,33 @@ class _DownloadedBillsPageState extends State<DownloadedBillsPage> {
   }
 
   void _deleteSelected() async {
+  final count = _selectedIndexes.length;
+  final confirm = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text(
+        'Delete Downloaded Bills?',
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      content: Text(
+        'Are you sure you want to delete $count bill(s) from your download history? This action cannot be undone.',
+        style: TextStyle(fontSize: 16),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('No', style: TextStyle(fontWeight: FontWeight.bold,
+            fontSize: 20, color: Colors.black)),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          child: const Text('Yes', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white,fontSize: 20)),
+        ),
+      ],
+    ),
+  );
+  if (confirm == true) {
     final toDelete = _selectedIndexes.map((i) => _filteredBills[i]['file'] as File).toList();
     for (final file in toDelete) {
       if (await file.exists()) await file.delete();
@@ -58,12 +85,10 @@ class _DownloadedBillsPageState extends State<DownloadedBillsPage> {
     await _loadBills();
     _clearSelection();
   }
+}
 
   void _shareSelected() async {
-    // IMPORTANT: If you get MissingPluginException for share_plus,
-    // do a FULL STOP and RESTART of your app (not just hot reload/hot restart).
-    // Also, make sure you are running on a real device or emulator (not web/desktop).
-    // If the error still occurs, run 'flutter clean' and then 'flutter pub get'.
+   
     final toShare = _selectedIndexes.map((i) => _filteredBills[i]['file'].path).toList();
     if (toShare.isNotEmpty) {
       await Share.shareXFiles(
