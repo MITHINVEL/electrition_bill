@@ -12,7 +12,7 @@ class _ShopBannerCarouselState extends State<ShopBannerCarousel> {
   final List<String> images = [
     'assets/images/png_images/shopname_homepage.jpg',
      'assets/images/png_images/shopbanner.jpg',
-      'assets/images/png_images/shopname_homepage.jpg',
+      'assets/images/png_images/shop.png',
      // Add more images as needed
   ];
   int _currentIndex = 0;
@@ -50,7 +50,7 @@ class _ShopBannerCarouselState extends State<ShopBannerCarousel> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only( bottom: 10.0),
+          padding: const EdgeInsets.only( bottom: 20.0),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20.0),

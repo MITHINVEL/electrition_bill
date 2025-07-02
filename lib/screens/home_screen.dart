@@ -1,6 +1,5 @@
 import 'package:electrition_bill/core/constant.dart';
 import 'package:electrition_bill/moels/product.dart';
-import 'package:electrition_bill/widgets/animated_lamp_row.dart';
 import 'package:electrition_bill/screens/prodect_screen.dart';
 import 'package:electrition_bill/widgets/homescreen_auto_scrol_image.dart';
 import 'package:flutter/material.dart';
@@ -97,44 +96,36 @@ class _ProductListPageState extends State<ProductListPage> {
                   ),
                 ),
               ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
               ShopBannerCarousel(),
-              const SizedBox(height: 25),
-              const Text(
-                'Home Light Collection',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
-                  fontFamily: 'Roboto',
-                ),
-              ),
-              const SizedBox(height: 15),
-              // First animation row (first half of stylist lamp images)
-              AnimatedLampRow(
-                imagePaths: [
-                  'assets/images/stylist_lamp/lamp2.jpg',
-                  'assets/images/stylist_lamp/lamp3.jpg',
-                  'assets/images/stylist_lamp/lamp4.jpg',
-                  'assets/images/stylist_lamp/lamp5.jpg',
-                  'assets/images/stylist_lamp/lamp6.jpg',
-                  'assets/images/stylist_lamp/lamp7.jpg',
-                  'assets/images/stylist_lamp/lamp8.jpg',
-                  'assets/images/stylist_lamp/lamp9.jpg',
-                  'assets/images/stylist_lamp/lamp10.jpg',
-                  'assets/images/stylist_lamp/lamp11.jpg',
-                  'assets/images/stylist_lamp/lamp12.jpg',
-                  'assets/images/stylist_lamp/lamp13.jpg',
-                  'assets/images/stylist_lamp/lamp14.jpg',
-                  'assets/images/stylist_lamp/lamp15.jpg',
-                  'assets/images/stylist_lamp/lamp16.jpg',
-                ],
-                animationDelay: 0,
-              ),
-              const SizedBox(height: 20),
-              // Second animation row (second half of stylist lamp images)
+              const SizedBox(height: 35),
+              Container(
+       margin: EdgeInsets.symmetric(horizontal: 1, vertical: 0),
     
-              
+                decoration: BoxDecoration(
+            
+                  borderRadius: BorderRadius.circular(24),
+                 
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color.fromARGB(255, 10, 10, 10).withOpacity(0.4),
+                      blurRadius: 10.0,
+                      offset: const Offset(1, 10),
+                    ),
+                  ],
+                ),
+                child:ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                child:SizedBox(
+                  height: 220,
+                  width: double.infinity,
+                  child: Image.asset(
+                    'assets/images/png_images/durga_electricals.jpg',
+                    fit: BoxFit.cover,
+                    
+                  ),
+                )
+           ))
             ],
           ),
         ),

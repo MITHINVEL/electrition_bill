@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 
 import 'package:electrition_bill/downloads/download%20screen/downloade_page.dart';
@@ -31,12 +29,13 @@ class _DownloadedBillsButtonState extends State<DownloadedBillsButton> {
               fontSize: 20),),
             onPressed: _loading
                 ? null
-                : () {
-                    Navigator.of(context).push(
+                : () async {
+                    await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => const DownloadedBillsPage(),
                       ),
                     );
+                    setState(() {}); // Refresh after returning
                   },
           ),
         ),

@@ -49,7 +49,6 @@ class _DownloadeSearchInputState extends State<DownloadeSearchInput> {
       padding: const EdgeInsets.all(10.0),
       child: TextField(
         controller: _controller,
-        keyboardType: TextInputType.number,
         decoration: InputDecoration(
           prefixIcon: const Icon(Icons.search),
           suffixIcon: IconButton(

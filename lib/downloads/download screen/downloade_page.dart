@@ -170,7 +170,7 @@ class _DownloadedBillsPageState extends State<DownloadedBillsPage> {
       final files = downloadsDir
           .listSync()
           .whereType<File>()
-          .where((f) => f.path.endsWith('.pdf'))
+          .where((f) => f.path.toLowerCase().endsWith('.pdf'))
           .toList();
       files.sort((a, b) => b.statSync().modified.compareTo(a.statSync().modified));
       setState(() {
@@ -179,7 +179,9 @@ class _DownloadedBillsPageState extends State<DownloadedBillsPage> {
           'name': f.uri.pathSegments.last,
           'modified': f.statSync().modified,
         }).toList();
-        _filteredBills = _bills;
+        // Always show all downloads, no filter by default
+        _filteredBills = List.from(_bills);
+        _filterLabel = 'All';
         _loading = false;
       });
     } catch (e) {

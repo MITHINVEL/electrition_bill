@@ -1,3 +1,4 @@
+import 'package:electrition_bill/core/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:electrition_bill/routing/bottomnavigationbar.dart';
 
@@ -11,7 +12,7 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1720), () {
+    Future.delayed(const Duration(milliseconds: 2500), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const Bottomnavigation()),
       );
@@ -21,26 +22,23 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 10, 10, 10),
+      backgroundColor: black,
       body: Stack(
         children: [
           Center(
-            child: Container(
-              height: 100,
-              width: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color.fromARGB(255, 253, 251, 251),
-                    blurRadius: 10.0,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Image.asset(
-                'assets/images/png_images/durga_electricals.jpg',
-                fit: BoxFit.cover,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20.0, right: 8.0, top: 8.0, bottom: 8.0),
+              child: Container(
+                height: 200,
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30.0),
+                
+                ),
+                child: Image.asset(
+                  'assets/images/png_images/splash.png',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
@@ -51,7 +49,7 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('assets/images/png_images/branding_mithinvel.jpg', width: 100),
+                  Image.asset('assets/images/png_images/branding_mithinvel.png', width: 100),
                   const SizedBox(width: 10),
               
                 ],

@@ -70,7 +70,7 @@ flutter_native_splash:
   image: assets/images/png_images/durga_electricals.jpg
   android: true
   ios: true
-  branding: assets/images/png_images/branding_mithinvel.jpg
+  branding: assets/images/png_images/branding_mithinvel.png
   branding_mode: bottom
   
 
@@ -90,8 +90,7 @@ flutter:
      - assets/images/logos/
      - assets/images/logos/pdfbackground.jpg
      - assets/images/png_images/
-     - assets/images/stylist_lamp/
-     - assets/images/png_images/branding_mithinvel.jpg
+     - assets/images/png_images/branding_mithinvel.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

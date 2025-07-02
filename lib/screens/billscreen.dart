@@ -137,6 +137,57 @@ class _BillPageState extends State<BillPage> {
     }
   }
 
+  // Function to show dialog and get PDF name from user
+  Future<String?> _getPdfNameDialog(BuildContext context) async {
+    TextEditingController controller = TextEditingController();
+    String? result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Enter PDF Name'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'Enter file name',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            borderSide: BorderSide(color: primary, width: 2),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: yellowColor, width: 2.5),
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            ),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Color.fromARGB(255, 230, 22, 22),
+            ),),
+          ),
+          TextButton(
+            onPressed: () {
+              String name = controller.text.trim();
+              if (name.isNotEmpty) {
+                Navigator.of(ctx).pop(name);
+              }
+            },
+            child: const Text('OK',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+              color: Color.fromARGB(255, 22, 211, 15),),
+            ),
+          ),
+        ],
+      ),
+    );
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     double total = 0;
@@ -168,6 +219,17 @@ class _BillPageState extends State<BillPage> {
                   const SnackBar(content: Text('Storage permission denied. Please allow storage permission in settings.')),
                 );
                 return;
+              }
+              // Show dialog to get PDF name
+              String? pdfName = await _getPdfNameDialog(context);
+              if (pdfName == null || pdfName.isEmpty) {
+                // User cancelled or didn't enter a name
+                return;
+              }
+              // Clean file name (remove extension if user added)
+              pdfName = pdfName.replaceAll(RegExp(r'[\\/:*?"<>|]'), '');
+              if (pdfName.toLowerCase().endsWith('.pdf')) {
+                pdfName = pdfName.substring(0, pdfName.length - 4);
               }
               // PDF bill generation (use current productCounts/prices)
               final pdf = pw.Document();
@@ -311,9 +373,9 @@ class _BillPageState extends State<BillPage> {
                     return;
                   }
                   debugPath = downloadsDir.path;
-                  final timestamp = DateTime.now().millisecondsSinceEpoch;
-                  final pdfPath = '${downloadsDir.path}/electrition_bill_$timestamp.pdf';
-                  final txtPath = '${downloadsDir.path}/electrition_bill_$timestamp.txt';
+                  // Use custom PDF name
+                  final pdfPath = '${downloadsDir.path}/$pdfName.pdf';
+                  final txtPath = '${downloadsDir.path}/$pdfName.txt';
                   final pdfFile = File(pdfPath);
                   final txtFile = File(txtPath);
                   try {
@@ -611,8 +673,8 @@ class _BillPageState extends State<BillPage> {
                           ],
                         ),
                       ),
-                    ),
-                  );
+                    )
+                    );
                 },
               ),
             ),
